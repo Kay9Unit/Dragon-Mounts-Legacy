@@ -1,10 +1,7 @@
 package com.github.kay9.dragonmounts;
 
 import com.github.kay9.dragonmounts.data.loot.DragonEggLootMod;
-import com.github.kay9.dragonmounts.dragon.DMLEggBlock;
-import com.github.kay9.dragonmounts.dragon.DragonEgg;
-import com.github.kay9.dragonmounts.dragon.DragonSpawnEgg;
-import com.github.kay9.dragonmounts.dragon.TameableDragon;
+import com.github.kay9.dragonmounts.dragon.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
@@ -49,6 +46,7 @@ public class DMLRegistry
 
     public static final RegistryObject<EntityType<TameableDragon>> DRAGON = entity("dragon", EntityType.Builder   .of(TameableDragon::new, MobCategory.CREATURE).sized(TameableDragon.BASE_WIDTH, TameableDragon.BASE_HEIGHT).clientTrackingRange(10).updateInterval(3));
     public static final RegistryObject<EntityType<DragonEgg>> DRAGON_EGG = entity("dragon_egg", EntityType.Builder.of(DragonEgg::new, MobCategory.MISC)         .sized(DragonEgg.WIDTH, DragonEgg.HEIGHT)                    .clientTrackingRange(5) .updateInterval(8));
+    public static final RegistryObject<EntityType<FallingEgg>> FALLING_EGG = entity("falling_egg", EntityType.Builder.of(FallingEgg::new, MobCategory.MISC)     .sized(0.98F, 0.98F)                          .clientTrackingRange(10).updateInterval(20));
 
     public static final RegistryObject<BlockEntityType<DMLEggBlock.Entity>> EGG_BLOCK_ENTITY = register("dragon_egg", Keys.BLOCK_ENTITY_TYPES, () -> BlockEntityType.Builder.of(DMLEggBlock.Entity::new, EGG_BLOCK.get()).build(null));
 

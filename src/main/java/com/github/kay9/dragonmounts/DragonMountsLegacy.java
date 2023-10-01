@@ -117,7 +117,7 @@ public class DragonMountsLegacy
     {
         EntityRenderers.register(DMLRegistry.DRAGON.get(), DragonRenderer::new);
         ForgeHooksClient.registerLayerDefinition(DragonRenderer.MODEL_LOCATION, () -> DragonModel.createBodyLayer(DragonModel.Properties.STANDARD));
-
+        EntityRenderers.register(DMLRegistry.FALLING_EGG.get(), FallingEggEntityRenderer::new);
         EntityRenderers.register(DMLRegistry.DRAGON_EGG.get(), EggEntityRenderer::new);
 
         BlockEntityRenderers.register(DMLRegistry.EGG_BLOCK_ENTITY.get(), DragonEggRenderer::instance);

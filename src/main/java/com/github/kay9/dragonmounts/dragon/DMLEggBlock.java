@@ -16,12 +16,13 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -34,11 +35,15 @@ import net.minecraftforge.client.IItemRenderProperties;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class DMLEggBlock extends DragonEggBlock implements EntityBlock
 {
+    private static final String DATA_ITEM_NAME = "ItemName";
+
     public DMLEggBlock()
     {
         super(BlockBehaviour.Properties.of(Material.EGG, MaterialColor.COLOR_BLACK).strength(3f, 9f).lightLevel(s -> 1).noOcclusion());
@@ -78,16 +83,36 @@ public class DMLEggBlock extends DragonEggBlock implements EntityBlock
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random)
+    {
+        if (isFree(level.getBlockState(pos.below())) && pos.getY() >= level.getMinBuildHeight() && level.getBlockEntity(pos) instanceof Entity block)
+        {
+            FallingEgg falling = new FallingEgg(DMLRegistry.FALLING_EGG.get(), level);
+            falling.hatchTime = block.hatchTime;
+            falling.setBreed(block.breedId.toString());
+            falling.setPos(
+                    (falling.xo = pos.getX()) + 0.5D,
+                    falling.yo = pos.getY(),
+                    (falling.zo = pos.getZ()) + 0.5D
+            );
+            falling.setStartPos(pos);
+            level.setBlock(pos, state.getFluidState().createLegacyBlock(), 3);
+            level.addFreshEntity(falling);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @Nonnull ItemStack getCloneItemStack(@Nonnull BlockGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state)
+    {
+        BlockEntity entity = level.getBlockEntity(pos);
+        return entity instanceof Entity egg ? Item.create(egg.breedId, egg.saveWithoutMetadata()) : super.getCloneItemStack(level, pos, state);
+    }
+
     public static void startHatching(DragonBreed breed, Level level, BlockPos pos)
     {
         startHatching(breed, breed.hatchTime(), level, pos);
-    }
-
-    @Override
-    protected void falling(FallingBlockEntity falling)
-    {
-        if (falling.level.getBlockEntity(falling.blockPosition()) instanceof Entity e)
-            falling.blockData = e.saveWithoutMetadata();
     }
 
     public static void startHatching(DragonBreed breed, int hatchTime, Level level, BlockPos pos)
@@ -104,21 +129,16 @@ public class DMLEggBlock extends DragonEggBlock implements EntityBlock
 
     public static class Item extends BlockItem
     {
-        private static final String DATA_ITEM_NAME = "ItemName";
-
         public Item()
         {
             super(DMLRegistry.EGG_BLOCK.get(), new net.minecraft.world.item.Item.Properties().rarity(Rarity.RARE).tab(CreativeModeTab.TAB_MISC));
         }
 
-        @SuppressWarnings("ConstantConditions")
         @Override
         public Component getName(ItemStack stack)
         {
             var tag = stack.getTag();
-            if (tag == null || tag.contains(DATA_ITEM_NAME))
-                return new TranslatableComponent(tag.getString(DATA_ITEM_NAME));
-            return super.getName(stack);
+            return tag == null || !tag.contains(DATA_ITEM_NAME) ? super.getName(stack) : new TranslatableComponent(tag.getString(DATA_ITEM_NAME));
         }
 
         @Override
@@ -169,21 +189,25 @@ public class DMLEggBlock extends DragonEggBlock implements EntityBlock
             consumer.accept(DragonEggRenderer.INSTANCE);
         }
 
+        public static ItemStack create(ResourceLocation id, @Nullable CompoundTag blockEntityTag)
+        {
+            var item = DMLRegistry.EGG_BLOCK_ITEM.get();
+            var stack = new ItemStack(item);
+            var tag = new CompoundTag();
+            if (blockEntityTag != null)
+                tag.put("BlockEntityTag", blockEntityTag);
+            tag.putString(DATA_ITEM_NAME, String.join(".", item.getDescriptionId(), id.getNamespace(), id.getPath()));
+            stack.setTag(tag);
+            return stack;
+        }
+
         public static ItemStack create(DragonBreed breed, RegistryAccess reg, int hatchTime)
         {
             var id = breed.id(reg);
-            var rootTag = new CompoundTag();
-
-            var bETag = new CompoundTag();
-            bETag.putString(TameableDragon.NBT_BREED, id.toString());
-            bETag.putInt(DragonEgg.NBT_HATCH_TIME, hatchTime);
-
-            rootTag.put("BlockEntityTag", bETag);
-            rootTag.putString(DATA_ITEM_NAME, String.join(".", DMLRegistry.EGG_BLOCK.get().getDescriptionId(), id.getNamespace(), id.getPath()));
-
-            var stack = new ItemStack(DMLRegistry.EGG_BLOCK_ITEM.get());
-            stack.setTag(rootTag);
-            return stack;
+            var tag = new CompoundTag();
+            tag.putString(TameableDragon.NBT_BREED, id.toString());
+            tag.putInt(DragonEgg.NBT_HATCH_TIME, hatchTime);
+            return create(id, tag);
         }
     }
 

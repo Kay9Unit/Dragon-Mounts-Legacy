@@ -1,0 +1,48 @@
+{
+  "entity.dragonmounts.dragon": "龙",
+  "entity.dragonmounts.falling_egg": "下落的龙蛋",
+
+  "dragon_breed.dragonmounts.aether": "天境龙",
+  "dragon_breed.dragonmounts.fire": "火属龙",
+  "dragon_breed.dragonmounts.end": "末影龙",
+  "dragon_breed.dragonmounts.forest": "森林龙",
+  "dragon_breed.dragonmounts.ghost": "幽灵龙",
+  "dragon_breed.dragonmounts.ice": "冰属龙",
+  "dragon_breed.dragonmounts.nether": "下界龙",
+  "dragon_breed.dragonmounts.water": "水属龙",
+
+  "item.dragonmounts.spawn_egg": "龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.aether": "天境龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.fire": "火属龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.end": "末影龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.forest": "森林龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.ghost": "幽灵龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.ice": "冰属龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.nether": "下界龙刷怪蛋",
+  "item.dragonmounts.spawn_egg.dragonmounts.water": "水属龙刷怪蛋",
+
+  "block.dragonmounts.dragon_egg.remaining_time": "离孵化还剩%s秒",
+  "block.dragonmounts.dragon_egg.change_breeds": "创造模式下：与龙交互可以将龙的种类设置为该龙蛋的种类",
+
+  "block.dragonmounts.dragon_egg": "龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.aether": "天境龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.fire": "火属龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.end": "末影龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.forest": "森林龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.ghost": "幽灵龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.ice": "冰属龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.nether": "下界龙蛋",
+  "block.dragonmounts.dragon_egg.dragonmounts.water": "水属龙蛋",
+
+  "key.dragonmounts.flight_descent": "下降（DML）",
+  "key.dragonmounts.camera_flight": "切换俯仰角控制方式（DML）",
+
+  "mount.dragon.vertical_controls": "按下%s以爬升，按下%s以下降",
+  "mount.dragon.camera_controls.enabled": "%s的俯仰角将跟随摄像机",
+  "mount.dragon.camera_controls.disabled": "%s的俯仰角将由按键控制",
+
+  "subtitles.entity.dragon.ambient": "龙：低吼",
+  "subtitles.entity.dragon.step": "龙：脚步声",
+  "subtitles.entity.dragon.death": "龙：咆哮",
+  "subtitles.entity.dragon.ambient.ghost": "龙：低吼"
+}

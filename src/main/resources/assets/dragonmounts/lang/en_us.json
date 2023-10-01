@@ -1,5 +1,6 @@
 {
   "entity.dragonmounts.dragon": "Dragon",
+  "entity.dragonmounts.falling_egg": "Falling Dragon Egg",
 
   "dragon_breed.dragonmounts.aether": "Aether Dragon",
   "dragon_breed.dragonmounts.fire": "Fire Dragon",
@@ -10,6 +11,7 @@
   "dragon_breed.dragonmounts.nether": "Nether Dragon",
   "dragon_breed.dragonmounts.water": "Water Dragon",
 
+  "item.dragonmounts.spawn_egg": "Dragon Spawn Egg",
   "item.dragonmounts.spawn_egg.dragonmounts.aether": "Aether Dragon Spawn Egg",
   "item.dragonmounts.spawn_egg.dragonmounts.fire": "Fire Dragon Spawn Egg",
   "item.dragonmounts.spawn_egg.dragonmounts.end": "End Dragon Spawn Egg",
@@ -22,6 +24,7 @@
   "block.dragonmounts.dragon_egg.remaining_time": "Hatches in %s seconds.",
   "block.dragonmounts.dragon_egg.change_breeds": "Creative mode: Interacting with a dragon will change it's breed to this egg's breed.",
 
+  "block.dragonmounts.dragon_egg": "Dragon Egg",
   "block.dragonmounts.dragon_egg.dragonmounts.aether": "Aether Dragon Egg",
   "block.dragonmounts.dragon_egg.dragonmounts.fire": "Fire Dragon Egg",
   "block.dragonmounts.dragon_egg.dragonmounts.end": "End Dragon Egg",

@@ -178,7 +178,7 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
     {
         super.defineSynchedData();
 
-        entityData.define(DATA_BREED,"");
+        entityData.define(DATA_BREED, BreedRegistry.FIRE_BUILTIN.getId().toString());
         entityData.define(DATA_SADDLED, false);
         entityData.define(DATA_AGE, 0); // default to adult stage
     }

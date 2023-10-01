@@ -63,14 +63,12 @@ public class DragonSpawnEgg extends ForgeSpawnEggItem
         return stack;
     }
 
-    @SuppressWarnings("DataFlowIssue")
     @Override
     public Component getName(ItemStack stack)
     {
         var tag = stack.getTagElement(DATA_TAG);
-        if (tag == null || tag.contains(DATA_ITEM_NAME))
-            return new TranslatableComponent(tag.getString(DATA_ITEM_NAME));
-        return super.getName(stack);
+        return tag == null || !tag.contains(DATA_ITEM_NAME) ? super.getName(stack) : new TranslatableComponent(tag.getString(DATA_ITEM_NAME));
+
     }
 
     public static int getColor(ItemStack stack, int tintIndex)
