@@ -5,14 +5,14 @@ import com.github.kay9.dragonmounts.DMLRegistry;
 import com.github.kay9.dragonmounts.DragonMountsLegacy;
 import com.github.kay9.dragonmounts.abilities.Ability;
 import com.github.kay9.dragonmounts.client.DragonAnimator;
+import com.github.kay9.dragonmounts.dragon.ai.DragonAi;
 import com.github.kay9.dragonmounts.client.Keybinds;
 import com.github.kay9.dragonmounts.client.MountControlsMessenger;
 import com.github.kay9.dragonmounts.dragon.ai.DragonBodyController;
-import com.github.kay9.dragonmounts.dragon.ai.DragonBreedGoal;
-import com.github.kay9.dragonmounts.dragon.ai.DragonFollowOwnerGoal;
 import com.github.kay9.dragonmounts.dragon.ai.DragonMoveController;
 import com.github.kay9.dragonmounts.dragon.breed.BreedRegistry;
 import com.github.kay9.dragonmounts.dragon.breed.DragonBreed;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -31,16 +31,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
-import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.animal.Animal;
@@ -49,6 +45,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SaddleItem;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,6 +54,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -157,23 +156,33 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
     }
 
     @Override
-    protected void registerGoals() // TODO: Much Smarter AI and features
+    protected Brain.Provider<TameableDragon> brainProvider()
     {
-//        goalSelector.addGoal(1, new DragonLandGoal(this));
-        goalSelector.addGoal(1, new FloatGoal(this));
-        goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
-        goalSelector.addGoal(3, new MeleeAttackGoal(this, 1, true));
-//        goalSelector.addGoal(4, new DragonBabuFollowParent(this, 10));
-        goalSelector.addGoal(5, new DragonFollowOwnerGoal(this, 1.1, 10f, 3.5f, 32f));
-        goalSelector.addGoal(5, new DragonBreedGoal(this));
-        goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1));
-        goalSelector.addGoal(7, new LookAtPlayerGoal(this, LivingEntity.class, 16f));
-        goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        return DragonAi.brainProvider();
+    }
 
-        targetSelector.addGoal(0, new OwnerHurtByTargetGoal(this));
-        targetSelector.addGoal(1, new OwnerHurtTargetGoal(this));
-        targetSelector.addGoal(2, new HurtByTargetGoal(this));
-        targetSelector.addGoal(3, new NonTameRandomTargetGoal<>(this, Animal.class, false, e -> !(e instanceof TameableDragon)));
+    @Override
+    protected Brain<?> makeBrain(Dynamic<?> pDynamic)
+    {
+        return DragonAi.makeBrain(this.brainProvider().makeBrain(pDynamic));
+    }
+
+    @Override
+    public Brain<TameableDragon> getBrain()
+    {
+        return (Brain<TameableDragon>)super.getBrain();
+    }
+
+    @Override
+    protected void customServerAiStep()
+    {
+        this.level.getProfiler().push("dragonBrain");
+        this.getBrain().tick((ServerLevel)this.level, this);
+        this.level.getProfiler().pop();
+        this.level.getProfiler().push("dragonActivityUpdate");
+        DragonAi.updateActivity(this);
+        this.level.getProfiler().pop();
+        super.customServerAiStep();
     }
 
     @Override
@@ -240,6 +249,7 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
     /**
      * Returns true if the dragon is saddled.
      */
+    @Override
     public boolean isSaddled()
     {
         return entityData.get(DATA_SADDLED);
@@ -286,6 +296,7 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
     /**
      * Returns true if the entity is flying.
      */
+    @Override
     public boolean isFlying()
     {
         return flying;
@@ -306,9 +317,11 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
 
     public void setNavigation(boolean flying)
     {
-            navigation = flying ?
-                    flyingNavigation :
-                    groundNavigation;
+        flyingNavigation.stop();
+        groundNavigation.stop();
+        navigation = flying ?
+                flyingNavigation :
+                groundNavigation;
     }
 
     @Override
@@ -455,7 +468,6 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
             {
                 navigation.stop();
                 setOrderedToSit(!isOrderedToSit());
-                if (isOrderedToSit()) setTarget(null);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
@@ -467,7 +479,6 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
             {
                 setRidingPlayer(player);
                 navigation.stop();
-                setTarget(null);
             }
             setOrderedToSit(false);
             setInSittingPose(false);
@@ -480,6 +491,15 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
     public void liftOff()
     {
         if (canFly()) jumpFromGround();
+    }
+
+    public boolean canLiftOff()
+    {
+        // Should liftOff call this instead of canFly so all checks are consistent?
+        return !this.isFlying()
+                && this.canFly()
+                && !this.isLeashed()
+                && level.noCollision(this, this.getBoundingBox().move(0, getJumpPower(), 0));
     }
 
     @Override
@@ -629,7 +649,6 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
         {
             setTame(true);
             navigation.stop();
-            setTarget(null);
             setOwnerUUID(player.getUUID());
             level.broadcastEntityEvent(this, (byte) 7);
         }
@@ -746,37 +765,32 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
      * Called when the entity is attacked.
      */
     @Override
-    public boolean hurt(DamageSource src, float par2)
+    public boolean hurt(DamageSource src, float amount)
     {
         if (isInvulnerableTo(src)) return false;
 
         // don't just sit there!
         setOrderedToSit(false);
 
-        return super.hurt(src, par2);
+        boolean flag = super.hurt(src, amount);
+
+        if (this.level.isClientSide)
+        {
+            return false;
+        }
+
+        if (flag && src.getEntity() instanceof LivingEntity)
+        {
+            DragonAi.wasHurtBy(this, (LivingEntity) src.getEntity());
+        }
+
+        return flag;
     }
 
-    /**
-     * Returns true if the mob is currently able to mate with the specified mob.
-     */
     @Override
-    public boolean canMate(Animal mate)
+    public boolean canFallInLove()
     {
-        if (mate == this) return false; // No. Just... no.
-        else if (!(mate instanceof TameableDragon)) return false;
-        else if (!canReproduce()) return false;
-
-        TameableDragon dragonMate = (TameableDragon) mate;
-
-        if (!dragonMate.isTame()) return false;
-        else if (!dragonMate.canReproduce()) return false;
-        else return isInLove() && dragonMate.isInLove();
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean canReproduce()
-    {
-        return isTame() && reproCount < DMLConfig.reproLimit();
+        return isTame() && isAdult() && reproCount < DMLConfig.reproLimit() && super.canFallInLove();
     }
 
     @Override
@@ -787,6 +801,18 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
             DragonMountsLegacy.LOG.warn("Tried to mate with non-dragon? Hello? {}", animal);
             return;
         }
+
+        // Respect Mod compatibility
+        if (MinecraftForge.EVENT_BUS.post(new BabyEntitySpawnEvent(animal, mate, null)))
+        {
+            // Reset the "inLove" state for the animals
+            animal.setAge(6000);
+            mate.setAge(6000);
+            return;
+        }
+
+        animal.resetLove();
+        mate.resetLove();
 
         DragonEgg egg = DMLRegistry.DRAGON_EGG.get().create(level);
 
@@ -837,6 +863,10 @@ public class TameableDragon extends TamableAnimal implements Saddleable, FlyingA
         mate.addReproCount();
         egg.setPos(getX(), getY(), getZ());
         level.addFreshEntity(egg);
+
+        level.broadcastEntityEvent(animal, (byte) 18);
+        if (level.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))
+            level.addFreshEntity(new ExperienceOrb(level, animal.getX(), animal.getY(), animal.getZ(), animal.getRandom().nextInt(7) + 1));
     }
 
     @Override
