@@ -1,0 +1,45 @@
+{
+  "entity.dragonmounts.dragon": "ドラゴン",
+
+  "dragon_breed.dragonmounts.aether": "エーテルドラゴン",
+  "dragon_breed.dragonmounts.fire": "ファイアドラゴン",
+  "dragon_breed.dragonmounts.end": "エンドドラゴン",
+  "dragon_breed.dragonmounts.forest": "フォレスとドラゴン",
+  "dragon_breed.dragonmounts.ghost": "ゴーストドラゴン",
+  "dragon_breed.dragonmounts.ice": "アイスドラゴン",
+  "dragon_breed.dragonmounts.nether": "ネザードラゴン",
+  "dragon_breed.dragonmounts.water": "ウォータードラゴン",
+
+  "item.dragonmounts.spawn_egg.dragonmounts.aether": "エーテルドラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.fire": "ファイアドラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.end": "エンドドラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.forest": "フォレストドラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.ghost": "ゴーストドラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.ice": "アイスドラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.nether": "ネザードラゴンのスポーンエッグ",
+  "item.dragonmounts.spawn_egg.dragonmounts.water": "ウォータードラゴンのスポーンエッグ",
+
+  "block.dragonmounts.dragon_egg.remaining_time": "%s秒以内に孵化します。",
+  "block.dragonmounts.dragon_egg.change_breeds": "クリエイティブモード：ドラゴンと対話することでドラゴンの品種がこの卵の品種に代わります。",
+
+  "block.dragonmounts.dragon_egg.dragonmounts.aether": "エーテルドラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.fire": "ファイアドラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.end": "エンドドラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.forest": "フォレストドラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.ghost": "ゴーストドラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.ice": "アイスドラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.nether": "ネザードラゴンの卵",
+  "block.dragonmounts.dragon_egg.dragonmounts.water": "ウォータードラゴンの卵",
+
+  "key.dragonmounts.flight_descent": "Dragon Mount フライト降下",
+  "key.dragonmounts.camera_flight": "Dragon Mount フライトコマンド",
+
+  "mount.dragon.vertical_controls": "%sで上昇し%sで降下します",
+  "mount.dragon.camera_controls.enabled": "%sはあなたの方へ向かって上昇していきます",
+  "mount.dragon.camera_controls.disabled": "%sはあなたのコマンドでのみ上昇するようになりました",
+
+  "subtitles.entity.dragon.ambient": "ドラゴンが話す",
+  "subtitles.entity.dragon.step": "ドラゴンが踏み鳴らす",
+  "subtitles.entity.dragon.death": "ドラゴンの金切り声",
+  "subtitles.entity.dragon.ambient.ghost": "ドラゴンが話す"
+}
